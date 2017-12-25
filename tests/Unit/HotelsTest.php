@@ -7,6 +7,8 @@ use App\Services\Hotels\Filters\DateFilter;
 use App\Services\Hotels\Filters\NameFilter;
 use App\Services\Hotels\Filters\PriceFilter;
 use App\Services\Hotels\HotelsStore;
+use App\Services\Hotels\Orders\NameOrder;
+use App\Services\Hotels\Orders\PriceOrder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -17,6 +19,7 @@ class HotelsTest extends TestCase
 
 	public function setUp()
 	{
+        parent::setUp();
 		$data = [
 			[
 				"name" => "Media One Hotel",
@@ -93,7 +96,7 @@ class HotelsTest extends TestCase
 
 
     /** @test */
-    public function hotels_store_can_add_filter()
+    public function it_can_add_filter()
     {
     	$this->hotelsStore->addFilter(new NameFilter('media'));
 
@@ -101,7 +104,7 @@ class HotelsTest extends TestCase
     }
 
     /** @test */
-    public function hotels_store_can_add_more_than_one_filter()
+    public function it_can_add_more_than_one_filter()
     {
     	$this->hotelsStore->addFilter(new NameFilter('media'));
         $this->assertEquals(1, $this->hotelsStore->getFiltersCount());
@@ -111,7 +114,7 @@ class HotelsTest extends TestCase
     }
 
     /** @test */
-    public function hotels_store_cannot_add_the_same_filter_more_than_once()
+    public function it_cannot_add_the_same_filter_more_than_once()
     {
     	$this->hotelsStore->addFilter(new NameFilter('media'));
 
@@ -121,14 +124,42 @@ class HotelsTest extends TestCase
     }
 
     /** @test */
-    public function hotels_store_can_reset_filters()
+    public function it_can_reset_filters()
     {
     	$this->hotelsStore->addFilter(new NameFilter('media'));
-
         $this->assertEquals(1, $this->hotelsStore->getFiltersCount());
 
         $this->hotelsStore->removeFilters();
         $this->assertEquals(0, $this->hotelsStore->getFiltersCount());
+    }
+
+    /** @test */
+    public function it_can_reset_filter_and_re_add_same_filter_again()
+    {
+        $this->hotelsStore->addFilter(new NameFilter('media'));
+        $this->assertEquals(1, $this->hotelsStore->getFiltersCount());
+
+        $this->hotelsStore->removeFilters();
+        $this->assertEquals(0, $this->hotelsStore->getFiltersCount());
+
+        $this->hotelsStore->addFilter(new NameFilter('media'));
+        $this->assertEquals(1, $this->hotelsStore->getFiltersCount());
+    }
+
+    /** @test */
+    public function it_can_reset_filters_and_re_add_same_filters_again()
+    {
+        $this->hotelsStore->addFilter(new NameFilter('media'));
+        $this->hotelsStore->addFilter(new CityFilter('media'));
+        $this->assertEquals(2, $this->hotelsStore->getFiltersCount());
+
+        $this->hotelsStore->removeFilters();
+        $this->assertEquals(0, $this->hotelsStore->getFiltersCount());
+
+        $this->hotelsStore->addFilter(new NameFilter('media'));
+        $this->hotelsStore->addFilter(new CityFilter('media'));
+
+        $this->assertEquals(2, $this->hotelsStore->getFiltersCount());
     }
 
     /** @test */
@@ -216,6 +247,16 @@ class HotelsTest extends TestCase
     }
 
     /** @test */
+    public function it_validates_date_filter_date_value()
+    {
+        $this->expectException('App\Services\Hotels\Exceptions\InvalidDateException');
+        $this->hotelsStore->addFilter(new DateFilter('10-2010-10'));
+
+        $this->expectException('App\Services\Hotels\Exceptions\InvalidDateException');
+        $this->hotelsStore->addFilter(new DateFilter('10-01-2020', '12-10-10'));
+    }
+
+    /** @test */
     public function it_returns_no_hotels_when_filter_by_none_existing_date()
     {
     	$this->hotelsStore->addFilter(new DateFilter('10-01-2010'));
@@ -281,5 +322,135 @@ class HotelsTest extends TestCase
         $this->assertEquals(2, $filtered->total());
     }
 
+    /** @test */
+    public function it_returns_no_hotels_while_filter_by_not_existing_city_and_name_combination_together()
+    {
+        $this->hotelsStore->addFilter(new NameFilter('media')); // 1 record
+        $this->hotelsStore->addFilter(new CityFilter('cairo')); // another record
+        $filtered = $this->hotelsStore->applyFilters();
+        $this->assertEquals(0, $filtered->total());
+    }
+
+    /** @test */
+    public function it_returns_hotels_while_filter_by_exisisting_city_and_name_combination_together()
+    {
+        $this->hotelsStore->addFilter(new NameFilter('media')); // 1 record
+        $this->hotelsStore->addFilter(new CityFilter('dubai')); // same record
+        $filtered = $this->hotelsStore->applyFilters();
+        $this->assertEquals(1, $filtered->total());
+        $this->assertEquals('dubai', $filtered->hotels->first()['city']);
+
+        $this->hotelsStore->removeFilters();
+
+        $this->hotelsStore->addFilter(new NameFilter('hotel')); // 3 records
+        $this->hotelsStore->addFilter(new CityFilter('cairo')); // 2 records
+        $filtered = $this->hotelsStore->applyFilters();
+        $this->assertEquals(2, $filtered->total());
+    }
+
+    /** @test */
+    public function it_returns_no_hotels_while_filter_by_not_existing_city_and_price_combination_together()
+    {
+        $this->hotelsStore->addFilter(new PriceFilter(80.6)); // 1 record
+        $this->hotelsStore->addFilter(new CityFilter('dubai')); // another record
+        $filtered = $this->hotelsStore->applyFilters();
+        $this->assertEquals(0, $filtered->total());
+    }
+
+    /** @test */
+    public function it_returns_hotels_while_filter_by_exisisting_city_and_price_combination_together()
+    {
+        $this->hotelsStore->addFilter(new PriceFilter(80.6)); // 1 record
+        $this->hotelsStore->addFilter(new CityFilter('cairo')); // same record
+        $filtered = $this->hotelsStore->applyFilters();
+        $this->assertEquals(1, $filtered->total());
+        $this->assertEquals('cairo', $filtered->hotels->first()['city']);
+    }
+
+    /** @test */
+    public function it_returns_no_hotels_while_filter_by_not_existing_name_and_city_and_price_combination_together()
+    {
+        $this->hotelsStore->addFilter(new PriceFilter(80.6)); // 1 record
+        $this->hotelsStore->addFilter(new CityFilter('dubai')); // 2 records
+        $this->hotelsStore->addFilter(new NameFilter('hotel')); // 3 records
+        $filtered = $this->hotelsStore->applyFilters();
+        $this->assertEquals(0, $filtered->total());
+    }
+
+    /** @test */
+    public function it_returns_hotels_while_filter_by_existing_name_and_city_and_price_combination_together()
+    {
+        $this->hotelsStore->addFilter(new PriceFilter(80.6)); // 1 record
+        $this->hotelsStore->addFilter(new CityFilter('cairo')); // 2 records
+        $this->hotelsStore->addFilter(new NameFilter('rotana')); // 3 records
+        $filtered = $this->hotelsStore->applyFilters();
+        $this->assertEquals(1, $filtered->total());
+    }
+
+    /** @test */
+    public function it_returns_no_hotels_while_filter_by_not_existing_name_and_city_and_price_and_date_combination_together()
+    {
+        $this->hotelsStore->addFilter(new PriceFilter(80.6)); // 1 record
+        $this->hotelsStore->addFilter(new CityFilter('dubai')); // 2 records
+        $this->hotelsStore->addFilter(new NameFilter('hotel')); // 3 records
+        $this->hotelsStore->addFilter(new DateFilter('11-10-2011')); // 1 record
+
+        $filtered = $this->hotelsStore->applyFilters();
+        $this->assertEquals(0, $filtered->total());
+    }
+
+    /** @test */
+    public function it_returns_hotels_while_filter_by_existing_name_and_city_and_price_and_date_combination_together()
+    {
+        $this->hotelsStore->addFilter(new PriceFilter(80.6)); // 1 record
+        $this->hotelsStore->addFilter(new CityFilter('cairo')); // 2 records
+        $this->hotelsStore->addFilter(new NameFilter('rotana')); // 1 records
+        $this->hotelsStore->addFilter(new DateFilter('11-10-2011')); // 1 record
+
+        $filtered = $this->hotelsStore->applyFilters();
+        $this->assertEquals(1, $filtered->total());
+    }
+
+    /** @test */
+    public function it_can_be_ordered_by_name_by_default_ascending()
+    {
+        $this->hotelsStore->orderBy(new NameOrder());
+        $this->assertEquals('Another Hotel', $this->hotelsStore->hotels->first()['name']);
+    }
+
+    /** @test */
+    public function it_can_be_ordered_by_name_ascending()
+    {
+        $this->hotelsStore->orderBy((new NameOrder())->asc());
+        $this->assertEquals('Another Hotel', $this->hotelsStore->hotels->first()['name']);
+    }
+
+    /** @test */
+    public function it_can_be_ordered_by_name_descending()
+    {
+        $this->hotelsStore->orderBy((new NameOrder())->desc());
+        $this->assertEquals('Rotana Hotel', $this->hotelsStore->hotels->first()['name']);
+    }
+
+    /** @test */
+    public function it_can_be_ordered_by_price_by_default_ascending()
+    {
+        $this->hotelsStore->orderBy(new PriceOrder());
+        $this->assertEquals(80.6, $this->hotelsStore->hotels->first()['price']);
+    }
+
+    /** @test */
+    public function it_can_be_ordered_by_price_ascending()
+    {
+        $this->hotelsStore->orderBy((new PriceOrder())->asc());
+        $this->assertEquals(80.6, $this->hotelsStore->hotels->first()['price']);
+    }
+
+    /** @test */
+    public function it_can_be_ordered_by_price_desc()
+    {
+        $this->hotelsStore->orderBy((new PriceOrder())->desc());
+        $this->assertEquals(180.6, $this->hotelsStore->hotels->first()['price']);
+    }
 
 }
