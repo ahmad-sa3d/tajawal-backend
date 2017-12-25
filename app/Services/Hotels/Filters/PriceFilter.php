@@ -23,8 +23,33 @@ class PriceFilter implements FilterContract
 	 */
 	public function __construct($min, $max = null)
 	{
-		$this->min = $min > 0 ? $min : 0;
-		$this->max = $max > $this->min ? $max : $min;
+		if (!$min) {
+			$this->min = $this->max = 0;
+			return;
+		}
+
+		$min_max = array_sort(explode(':', $min));
+
+		if(count($min_max) > 1){
+			$this->min = $min_max[0];
+			$this->max = $min_max[1];
+		} else {
+			$this->min = $min_max[0];
+		}
+
+		if($this->min < 0) {
+			$this->min = 0;
+		}
+
+		if(!$this->max) {
+			$this->max = $max ? $max : $this->min;
+		}
+
+		if($this->max < $this->min) {
+			$max = $this->max;
+			$this->max = $this->min;
+			$this->min = $max;
+		}
 	}
 	
 	/**

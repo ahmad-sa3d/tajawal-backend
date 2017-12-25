@@ -230,6 +230,28 @@ class HotelsTest extends TestCase
         $this->assertEquals(0, $filtered->total());
     }
 
+    /** @test */
+    public function it_returns_no_hotels_when_filter_by_none_existing_price_range_as_single_value()
+    {
+        $this->hotelsStore->addFilter(new PriceFilter('200:300'));
+        $filtered = $this->hotelsStore->applyFilters();
+        $this->assertEquals(0, $filtered->total());
+
+        $this->hotelsStore->removeFilters();
+
+        $this->hotelsStore->addFilter(new PriceFilter('80:110'));
+        $filtered = $this->hotelsStore->applyFilters();
+        $this->assertEquals(2, $filtered->total());
+        $this->assertNotEquals('Another Hotel', $filtered->hotels->first()['name']);
+
+        $this->hotelsStore->removeFilters();
+
+        $this->hotelsStore->addFilter(new PriceFilter('110:80'));
+        $filtered = $this->hotelsStore->applyFilters();
+        $this->assertEquals(2, $filtered->total());
+        $this->assertNotEquals('Another Hotel', $filtered->hotels->first()['name']);
+    }
+
     public function it_returns_hotels_when_filter_by_existing_price()
     {
     	$this->hotelsStore->addFilter(new PriceFilter(80.6));
@@ -319,6 +341,22 @@ class HotelsTest extends TestCase
 
         $this->hotelsStore->addFilter(new DateFilter('10-10-2020', '12-10-2020'));
     	$filtered = $this->hotelsStore->applyFilters();
+        $this->assertEquals(2, $filtered->total());
+    }
+
+    /** @test */
+    public function it_returns_hotels_when_filter_by_existing_date_in_range_as_single_argument()
+    {
+        $this->hotelsStore->addFilter(new DateFilter('10-10-2020:12-10-2020'));
+        $filtered = $this->hotelsStore->applyFilters();
+        $this->assertEquals(2, $filtered->total());
+    }
+
+    /** @test */
+    public function it_returns_hotels_when_filter_by_existing_date_in_range_as_single_argument_reversed()
+    {
+        $this->hotelsStore->addFilter(new DateFilter('12-10-2020:10-10-2020'));
+        $filtered = $this->hotelsStore->applyFilters();
         $this->assertEquals(2, $filtered->total());
     }
 

@@ -26,6 +26,19 @@ class DateFilter implements FilterContract
 	 */
 	public function __construct($from, $to = null)
 	{
+		if (!$from) {
+			return;
+		} else {
+			$from_to = explode(':', $from);
+
+			if(count($from_to) > 1){
+				$from = $from_to[0];
+				$to = $from_to[1];
+			} else {
+				$from = $from_to[0];
+			}
+		}
+
 		$validator = Validator::make([
 			'from' => $from,
 			'to' => $to
@@ -35,11 +48,17 @@ class DateFilter implements FilterContract
 		]);
 
 		if ($validator->fails()) {
-			throw new InvalidDateException(__METHOD__ . $validator->errors()->first());
+			throw new InvalidDateException(__METHOD__ . ' ' . $validator->errors()->first());
 		}
 
 		$this->from = strtotime($from);
 		$this->to = $to ? strtotime($to) : $this->from;
+
+		if ($this->to < $this->from) {
+			$to = $this->from;
+			$this->from = $this->to;
+			$this->to = $to;
+		}
 	}
 	
 	/**
@@ -52,6 +71,10 @@ class DateFilter implements FilterContract
 	 */
 	public function apply($hotel)
 	{
+		if (!$this->from) {
+			return true;
+		}
+
 		$is_available = false;
 
 		if (!isset($hotel['availability']) || !is_array($hotel['availability'])) {
