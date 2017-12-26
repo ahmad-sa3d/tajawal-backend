@@ -4,6 +4,7 @@ namespace App\Services\Hotels;
 use App\Services\Hotels\Exceptions\FilterDuplicatedException;
 use App\Services\Hotels\FilterContract;
 use App\Services\Hotels\OrderContract;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 
 class HotelsStore {
@@ -40,6 +41,15 @@ class HotelsStore {
 		} else {
 			throw new \Exception(__METHOD__ . ' should accept collection or array of hotels');
 		}
+	}
+
+	/**
+	 * Get Hotels Collection
+	 * @return Collection Hotels Collection
+	 */
+	public function get()
+	{
+		return $this->hotels;
 	}
 	
 	/**
@@ -130,9 +140,24 @@ class HotelsStore {
 
 		$this->hotels = $this->hotels->$orderMethod(function($hotel, $key) use($order){
 			return $order->orderBy($hotel);
-		});
+		})->values();
 
 		return $this;
+	}
+
+	/**
+	 * Paginate Hotels Connection
+	 * @param  integer $per_page     Number of hotels per page
+	 * @param  integer $current_page Current Page
+	 * @param  array   $options      LengthAwarePaginator Options
+	 * @return LengthAwarePaginator  LengthAwarePaginator Paginator instance
+	 */
+	public function paginate($per_page = 10, $current_page = 1, array $options = [])
+	{
+		$per_page = $per_page <= 0 ? 10 : $per_page;
+		$skip = ($current_page - 1) * $per_page;
+		$sliced_hotels = $this->hotels->slice($skip, $per_page);
+		return new LengthAwarePaginator($sliced_hotels, $this->total(), $per_page, $current_page, $options);
 	}
 
 	/**

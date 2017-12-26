@@ -464,9 +464,23 @@ class HotelsTest extends TestCase
     }
 
     /** @test */
+    public function it_can_be_ordered_by_name_ascending_from_order_constructor()
+    {
+        $this->hotelsStore->orderBy((new NameOrder('asc')));
+        $this->assertEquals('Another Hotel', $this->hotelsStore->hotels->first()['name']);
+    }
+
+    /** @test */
     public function it_can_be_ordered_by_name_descending()
     {
         $this->hotelsStore->orderBy((new NameOrder())->desc());
+        $this->assertEquals('Rotana Hotel', $this->hotelsStore->hotels->first()['name']);
+    }
+
+    /** @test */
+    public function it_can_be_ordered_by_name_descending_from_order_constructor()
+    {
+        $this->hotelsStore->orderBy((new NameOrder('desc')));
         $this->assertEquals('Rotana Hotel', $this->hotelsStore->hotels->first()['name']);
     }
 
@@ -489,6 +503,30 @@ class HotelsTest extends TestCase
     {
         $this->hotelsStore->orderBy((new PriceOrder())->desc());
         $this->assertEquals(180.6, $this->hotelsStore->hotels->first()['price']);
+    }
+
+    /** @test */
+    public function it_can_paginate_hotels()
+    {
+        $paginated = $this->hotelsStore->orderBy(new PriceOrder())->paginate(1, 1);
+        $this->assertEquals(1, $paginated->count());
+        $this->assertEquals(80.6, $paginated->first()['price']);
+
+        $paginated = $this->hotelsStore->orderBy(new PriceOrder())->paginate(1, 2);
+        $this->assertEquals(1, $paginated->count());
+        $this->assertEquals(102.2, $paginated->first()['price']);
+
+        $paginated = $this->hotelsStore->orderBy(new PriceOrder())->paginate(2, 1);
+        $this->assertEquals(2, $paginated->count());
+        $this->assertEquals(80.6, $paginated->first()['price']);
+        $this->assertEquals(102.2, $paginated->last()['price']);
+    }
+
+    /** @test */
+    public function it_can_get_hotels_with_get_method()
+    {
+        $this->assertEquals($this->hotelsStore->hotels->count(), $this->hotelsStore->get()->count());
+        $this->assertEquals($this->hotelsStore->total(), $this->hotelsStore->get()->count());
     }
 
 }

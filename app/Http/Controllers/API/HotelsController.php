@@ -9,6 +9,8 @@ use App\Services\Hotels\Filters\DateFilter;
 use App\Services\Hotels\Filters\NameFilter;
 use App\Services\Hotels\Filters\PriceFilter;
 use App\Services\Hotels\HotelsStore;
+use App\Services\Hotels\Orders\NameOrder;
+use App\Services\Hotels\Orders\PriceOrder;
 use Illuminate\Http\Request;
 
 class HotelsController extends Controller
@@ -90,9 +92,23 @@ class HotelsController extends Controller
 
             $hotelsStore = $hotelsStore->applyFilters();
 
+            switch ($request->get('order_by')) {
+                case 'price':
+                    $order = new PriceOrder($request->get('order_direction'));
+                    break;
+                case 'name':
+                    $order = new NameOrder($request->get('order_direction'));
+                default:
+                    $order = new NameOrder($request->get('order_direction'));
+            }
+
+            $output = $hotelsStore->orderBy($order)
+                            ->paginate($request->get('per_page'), $request->get('page'), ['path' => \Request::url()])
+                            ->appends($request->except('page'));
+
         	// Send response
         	return $this->sendResponse( [
-        		'hotels' =>$hotelsStore->hotels,
+        		'hotels' => $output
         	] );
 
         } catch(\Exception $e) {

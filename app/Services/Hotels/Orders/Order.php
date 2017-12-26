@@ -12,6 +12,19 @@ abstract class Order implements OrderContract
 	protected $orderDirection = 'ASC';
 
 	/**
+	 * Instantiate new order with direction
+	 * @param string $order_direction direction asc|desc
+	 */
+	public function __construct($order_direction = 'asc')
+	{
+		if (strtolower($order_direction) == 'desc') {
+			$this->desc();
+		} else {
+			$this->asc();
+		}
+	}
+
+	/**
 	 * Apply Order By
 	 * @return Mix Value to order Againest
 	 */
@@ -21,7 +34,7 @@ abstract class Order implements OrderContract
 	 * Order in Asccednding direction
 	 * @return OrderContract instance
 	 */
-	public function asc()
+	final public function asc()
 	{
 		$this->orderDirection = 'ASC';
 		return $this;
@@ -31,7 +44,7 @@ abstract class Order implements OrderContract
 	 * Order in Asccednding direction
 	 * @return OrderContract instance
 	 */
-	public function desc()
+	final public function desc()
 	{
 		$this->orderDirection = 'DESC';
 		return $this;
@@ -41,7 +54,7 @@ abstract class Order implements OrderContract
 	 * Check if order direction is ASC
 	 * @return boolean
 	 */
-	public function isAscOrder()
+	final public function isAscOrder()
 	{
 		return ! $this->isDescOrder();
 	}
@@ -50,7 +63,7 @@ abstract class Order implements OrderContract
 	 * Check if order direction is DESC
 	 * @return boolean
 	 */
-	public function isDescOrder()
+	final public function isDescOrder()
 	{
 		return !!($this->orderDirection == 'DESC');
 	}
