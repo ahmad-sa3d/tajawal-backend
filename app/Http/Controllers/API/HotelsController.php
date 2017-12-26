@@ -72,6 +72,7 @@ class HotelsController extends Controller
                 $order = new PriceOrder($request->get('order_direction'));
                 break;
             case 'name':
+            default:
                 $order = new NameOrder($request->get('order_direction'));
         }
 

@@ -1,18 +1,16 @@
 <p align="center"><img src="https://laravel.com/assets/img/components/logo-laravel.svg"></p>
 
 <p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/d/total.svg" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/v/stable.svg" alt="Latest Stable Version"></a>
+<a href="https://travis-ci.org/ahmad-sa3d/tajawal-backend"><img src="https://api.travis-ci.org/ahmad-sa3d/tajawal-backend.svg?branch=master" alt="Build Status"></a>
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/license.svg" alt="License"></a>
 </p>
 
-## Student Web Service
+## Tajawal Hotels Filter Task
 
 
 * Set env `APP_URL`, `APP_API_URL`
-* Web Service URL `/v1/sessions`
-* Web Service Inputs
+* Web Service URL `{APP_API_URL}/v1/hotels`
+* Web Service Query Inputs
 	- `start_date` __String__ date in format `d-m-Y`
 		
 		> __Note:__<br>
