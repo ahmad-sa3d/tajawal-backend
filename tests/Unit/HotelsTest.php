@@ -14,6 +14,16 @@ use Tests\TestCase;
 
 /**
  * @coversDefaultClass \App\Services\Hotels\HotelsStore
+ * @covers \App\Services\Hotels\HotelsStore<extended>
+ * @covers \App\Services\Hotels\Orders\NameOrder<extended>
+ * @covers \App\Services\Hotels\Orders\PriceOrder<extended>
+ * @covers \App\Services\Hotels\Filters\CityFilter<extended>
+ * @covers \App\Services\Hotels\Filters\NameFilter<extended>
+ * @covers \App\Services\Hotels\Filters\PriceFilter<extended>
+ * @covers \App\Services\Hotels\Filters\DateFilter<extended>
+ * @covers \App\Services\Hotels\Exceptions\FilterDuplicatedException
+ * @covers \App\Services\Hotels\Exceptions\InvalidArgumentException
+ * @covers \App\Services\Hotels\Exceptions\InvalidDateException
  */
 class HotelsTest extends TestCase
 {

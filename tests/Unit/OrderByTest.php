@@ -6,6 +6,9 @@ use App\Services\Hotels\Orders\NameOrder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
+/**
+ * @covers \App\Services\Hotels\Orders\NameOrder<extended>
+ */
 class OrderByTest extends TestCase
 {
     /**
