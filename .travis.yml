@@ -19,4 +19,4 @@ script:
 
 after_script:
   - vendor/bin/test-reporter --stdout > codeclimate.json
-  - sh -c 'curl -X post -d @codeclimate.json -H \"Content-Type: application\json\" -H \"User-Agent: Code Climate PHP Test reporter\" https://codeclimate.com/test_reports ;'
+  - "sh -c 'curl -X post -d @codeclimate.json -H \"Content-Type: application/json\" -H \"User-Agent: Code Climate PHP Test reporter\" https://codeclimate.com/test_reports ;'"
