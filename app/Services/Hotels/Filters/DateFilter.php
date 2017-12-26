@@ -39,17 +39,7 @@ class DateFilter implements FilterContract
 			}
 		}
 
-		$validator = Validator::make([
-			'from' => $from,
-			'to' => $to
-		], [
-			'from' => 'required|date_format:d-m-Y',
-			'to' => 'nullable|date_format:d-m-Y',
-		]);
-
-		if ($validator->fails()) {
-			throw new InvalidDateException(__METHOD__ . ' ' . $validator->errors()->first());
-		}
+		$this->validateInputs($from, $to);
 
 		$this->from = strtotime($from);
 		$this->to = $to ? strtotime($to) : $this->from;
@@ -89,5 +79,26 @@ class DateFilter implements FilterContract
 		}
 
 		return $is_available;
+	}
+
+	/**
+	 * Validate Date Range
+	 * @param  string $from start range
+	 * @param  string $to   end range
+	 * @return void
+	 */
+	private function validateInputs($from, $to)
+	{
+		$validator = Validator::make([
+			'from' => $from,
+			'to' => $to
+		], [
+			'from' => 'required|date_format:d-m-Y',
+			'to' => 'nullable|date_format:d-m-Y',
+		]);
+
+		if ($validator->fails()) {
+			throw new InvalidDateException(__METHOD__ . ' ' . $validator->errors()->first());
+		}
 	}
 }
