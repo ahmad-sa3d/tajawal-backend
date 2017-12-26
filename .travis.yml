@@ -1,3 +1,7 @@
+env:
+  global:
+    - CC_TEST_REPORTER_ID=25cdbdb9a3ca7aebb372300017b87e21255fa3db89d11c72cc96fb0b993e5019
+
 language: php
 
 php:
@@ -6,8 +10,13 @@ php:
 before_script:
   - cp .env.travis .env
   - composer self-update
+  - composer require codeclimate/php-test-reporter --dev
   - composer install
   - php artisan key:generate
 
 script:
-  - vendor/bin/phpunit
+  - vendor/bin/phpunit --testsuite=unit --coverage-text --coverage-clover build/logs/clover.xml
+
+after_script:
+  - vendor/bin/test-reporter --stdout > codeclimate.json
+  - "sh -c 'curl -X post -d @codeclimate.json -H \"Content-Type: application\json\" -H\"User-Agent: Code Climate PHP Test reporter\" https://codeclimate.com/test_reports ;'"
