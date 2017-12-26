@@ -2,6 +2,9 @@ env:
   global:
     - CC_TEST_REPORTER_ID=25cdbdb9a3ca7aebb372300017b87e21255fa3db89d11c72cc96fb0b993e5019
 
+notifications:
+  slack: a7madsa3d:NV7CXXB4FMHOLUIuBQ81RbQe
+
 language: php
 
 php:

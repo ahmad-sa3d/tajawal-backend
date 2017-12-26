@@ -2,6 +2,11 @@
 
 <p align="center">
 <a href="https://travis-ci.org/ahmad-sa3d/tajawal-backend"><img src="https://api.travis-ci.org/ahmad-sa3d/tajawal-backend.svg?branch=master" alt="Build Status"></a>
+
+<a href="https://codeclimate.com/github/ahmad-sa3d/tajawal-backend/maintainability"><img src="https://api.codeclimate.com/v1/badges/7a42bac3e3c2ac7f7060/maintainability" /></a>
+
+<a href="https://codeclimate.com/github/ahmad-sa3d/tajawal-backend/test_coverage"><img src="https://api.codeclimate.com/v1/badges/7a42bac3e3c2ac7f7060/test_coverage" /></a>
+
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/license.svg" alt="License"></a>
 </p>
 
