@@ -1,6 +1,9 @@
 <?php
 namespace App\Services\Hotels;
 
+/**
+ * @codeCoverageIgnore
+ */
 interface OrderContract {
 	/**
 	 * Function that responsible to implementing how to apply order
