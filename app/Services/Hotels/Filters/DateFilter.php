@@ -26,18 +26,11 @@ class DateFilter implements FilterContract
 	 */
 	public function __construct($from, $to = null)
 	{
-		if (!$from) {
-			return;
-		} else {
-			$from_to = explode(':', $from);
+		if (!$from) return;
 
-			if(count($from_to) > 1){
-				$from = $from_to[0];
-				$to = $from_to[1];
-			} else {
-				$from = $from_to[0];
-			}
-		}
+		$from_to = explode(':', $from);
+		$from = $from_to[0];
+		$to = count($from_to) > 1 ? $from_to[1] : $to;
 
 		$this->validateInputs($from, $to);
 
@@ -67,7 +60,7 @@ class DateFilter implements FilterContract
 
 		$is_available = false;
 
-		if (!isset($hotel['availability']) || !is_array($hotel['availability'])) {
+		if (!$this->hasAvailabilityPeriods($hotel)) {
 			return false;
 		}
 
@@ -100,5 +93,15 @@ class DateFilter implements FilterContract
 		if ($validator->fails()) {
 			throw new InvalidDateException(__METHOD__ . ' ' . $validator->errors()->first());
 		}
+	}
+
+	/**
+	 * Check if hotel has available periods or not
+	 * @param  array  $hotel hotel to check
+	 * @return boolean
+	 */
+	public function hasAvailabilityPeriods($hotel)
+	{
+		return (!isset($hotel['availability']) || !is_array($hotel['availability'])) ? false : true;
 	}
 }
