@@ -15,19 +15,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        // Validation rule for future day
-       Validator::extend('future_day', function($attribute, $value, $parameters, $validator)
-        {
-            $now = Carbon::now();
-            return !$now->tomorrow()->startOfDay()->gte( Carbon::createFromFormat( 'd-m-Y', $value )->startOfDay() );
-        });
-
-       Validator::replacer('future_day', function($message, $attribute, $rule, $parameters){
-            if( $message && $parameters )
-                return $message;
-            else
-                return 'date must be day in the future';
-        });
+        //
     }
 
     /**

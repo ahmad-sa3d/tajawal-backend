@@ -2,6 +2,7 @@
 namespace App\Services\Hotels;
 
 use App\Services\Hotels\Exceptions\FilterDuplicatedException;
+use App\Services\Hotels\Exceptions\InvalidArgumentException;
 use App\Services\Hotels\FilterContract;
 use App\Services\Hotels\OrderContract;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -34,12 +35,12 @@ class HotelsStore {
 	 */
 	public function __construct($hotels)
 	{
-		if ($hotels instanceof Collection){
+		if ($hotels instanceof Collection) {
 			$this->hotels = $hotels;
-		} else if (is_array($hotels)){
+		} else if (is_array($hotels)) {
 			$this->hotels = collect($hotels);
 		} else {
-			throw new \Exception(__METHOD__ . ' should accept collection or array of hotels');
+			throw new InvalidArgumentException(__METHOD__ . ' should accept collection or array of hotels');
 		}
 	}
 
@@ -67,8 +68,9 @@ class HotelsStore {
 	 */
 	public function addFilter(FilterContract $filter)
 	{
-		if(!$this->filters)
+		if (!$this->filters) {
 			$this->filters = collect();
+		}
 
 		$filter_class_name = get_class($filter);
 		$this->checkAgainestFilterDuplication($filter_class_name);
@@ -163,6 +165,9 @@ class HotelsStore {
 
 	/**
 	 * Check if there are flters added
+	 *
+	 * @codeCoverageIgnore
+	 * 
 	 * @return boolean true if there are filters added or false if not
 	 */
 	private function hasFilters()
@@ -174,6 +179,8 @@ class HotelsStore {
 	 * Check if given filter namespace is already added
 	 *
 	 * prevent adding the same filter more than once
+	 * 
+	 * @codeCoverageIgnore
 	 * 
 	 * @param  String $filter_class_name Filter full namespace
 	 * @return void                    
@@ -192,6 +199,8 @@ class HotelsStore {
 	 * Magic Method
 	 *
 	 * used to get protected properties as read only
+	 *
+	 * @codeCoverageIgnore
 	 * 
 	 * @param  String $property Called Property
 	 * @return Mix           Property corresponding value

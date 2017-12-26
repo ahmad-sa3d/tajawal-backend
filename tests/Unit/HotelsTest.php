@@ -12,6 +12,9 @@ use App\Services\Hotels\Orders\PriceOrder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
+/**
+ * @coversDefaultClass \App\Services\Hotels\HotelsStore
+ */
 class HotelsTest extends TestCase
 {
 	protected $hotelsStore;
@@ -86,6 +89,13 @@ class HotelsTest extends TestCase
     public function it_returns_all_hotels()
     {
         $this->assertEquals($this->originalDataCount, $this->hotelsStore->hotels->count());
+    }
+
+    /** @test */
+    public function it_throw_exception_if_instantiated_with_argument_of_type_not_array_or_collection()
+    {
+        $this->expectException('\App\Services\Hotels\Exceptions\InvalidArgumentException');
+        new HotelsStore('');
     }
 
     /** @test */
@@ -180,6 +190,14 @@ class HotelsTest extends TestCase
     }
 
     /** @test */
+    public function it_returns_all_hotels_when_filter_by_name_given_empty_value()
+    {
+        $this->hotelsStore->addFilter(new NameFilter(''));
+        $filtered = $this->hotelsStore->applyFilters();
+        $this->assertEquals(3, $filtered->total());
+    }
+
+    /** @test */
     public function it_returns_hotels_when_filter_by_existing_hotel_name()
     {
     	$this->hotelsStore->addFilter(new NameFilter('media'));
@@ -193,7 +211,9 @@ class HotelsTest extends TestCase
         $this->assertEquals($this->originalDataCount, $filtered->total());
     }
 
-    /** @test */
+    /**
+     * @test
+     */
     public function it_returns_no_hotels_when_filter_by_none_existing_hotel_city()
     {
     	$this->hotelsStore->addFilter(new CityFilter('keyword'));
@@ -201,17 +221,30 @@ class HotelsTest extends TestCase
         $this->assertEquals(0, $filtered->total());
     }
 
+    /** @test */
     public function it_returns_hotels_when_filter_by_existing_hotel_city()
     {
     	$this->hotelsStore->addFilter(new CityFilter('dubai'));
     	$filtered = $this->hotelsStore->applyFilters();
         $this->assertEquals(1, $filtered->total());
-        $this->assertEquals('dubai', $filtered->hotels->first()['dubai']);
+        $this->assertEquals('dubai', $filtered->hotels->first()['city']);
 
         $this->hotelsStore->removeFilters();
+
     	$this->hotelsStore->addFilter(new CityFilter('cairo'));
         $filtered = $this->hotelsStore->applyFilters();
-        $this->assertNotEquals('dubai', $filtered->first()['city']);
+        $this->assertEquals(2, $filtered->total());
+        $this->assertNotEquals('dubai', $filtered->hotels->first()['city']);
+
+        $this->hotelsStore->removeFilters();
+    }
+
+    /** @test */
+    public function it_returns_all_hotels_when_filter_by_city_given_empty_value()
+    {
+        $this->hotelsStore->addFilter(new CityFilter(''));
+        $filtered = $this->hotelsStore->applyFilters();
+        $this->assertEquals(3, $filtered->total());
     }
 
     /** @test */
@@ -220,6 +253,14 @@ class HotelsTest extends TestCase
     	$this->hotelsStore->addFilter(new PriceFilter(80));
     	$filtered = $this->hotelsStore->applyFilters();
         $this->assertEquals(0, $filtered->total());
+    }
+
+    /** @test */
+    public function it_returns_all_hotels_when_filter_by_price_given_empty_value()
+    {
+        $this->hotelsStore->addFilter(new PriceFilter(''));
+        $filtered = $this->hotelsStore->applyFilters();
+        $this->assertEquals(3, $filtered->total());
     }
 
     /** @test */
@@ -252,6 +293,7 @@ class HotelsTest extends TestCase
         $this->assertNotEquals('Another Hotel', $filtered->hotels->first()['name']);
     }
 
+    /** @test */
     public function it_returns_hotels_when_filter_by_existing_price()
     {
     	$this->hotelsStore->addFilter(new PriceFilter(80.6));
@@ -260,6 +302,7 @@ class HotelsTest extends TestCase
         $this->assertEquals('Rotana Hotel', $filtered->hotels->first()['name']);
     }
 
+    /** @test */
     public function it_returns_hotels_when_filter_by_existing_price_range()
     {
     	$this->hotelsStore->addFilter(new PriceFilter(80, 110));
@@ -283,6 +326,28 @@ class HotelsTest extends TestCase
     {
     	$this->hotelsStore->addFilter(new DateFilter('10-01-2010'));
     	$filtered = $this->hotelsStore->applyFilters();
+        $this->assertEquals(0, $filtered->total());
+    }
+
+    /** @test */
+    public function it_returns_all_hotels_when_filter_by_date_given_empty_value()
+    {
+        $this->hotelsStore->addFilter(new DateFilter(''));
+        $filtered = $this->hotelsStore->applyFilters();
+        $this->assertEquals(3, $filtered->total());
+    }
+
+    /** @test */
+    public function it_returns_no_hotels_when_filter_by_date_on_hotels_doesnot_has_availability_key()
+    {
+        $hotels = new HotelsStore([
+            'name' => 'test',
+            'city' => 'cairo',
+            'price' => 20,
+        ]);
+
+        $hotels->addFilter(new DateFilter('10-01-2010'));
+        $filtered = $hotels->applyFilters();
         $this->assertEquals(0, $filtered->total());
     }
 
@@ -522,11 +587,28 @@ class HotelsTest extends TestCase
         $this->assertEquals(102.2, $paginated->last()['price']);
     }
 
-    /** @test */
+    /**
+     * @test
+     * @covers ::get
+     */
     public function it_can_get_hotels_with_get_method()
     {
         $this->assertEquals($this->hotelsStore->hotels->count(), $this->hotelsStore->get()->count());
         $this->assertEquals($this->hotelsStore->total(), $this->hotelsStore->get()->count());
+    }
+
+    /** @test */
+    public function it_calls_city_filter_apply_method()
+    {
+        $cityFilter = $this->getMockBuilder(CityFilter::class)
+                        ->setConstructorArgs(['cairo'])
+                        ->setMethods(['apply'])
+                        ->getMock();
+
+        $cityFilter->expects($this->exactly(3))
+                    ->method('apply');
+
+        $this->hotelsStore->addFilter($cityFilter)->applyFilters();
     }
 
 }
