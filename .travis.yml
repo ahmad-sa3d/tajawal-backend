@@ -19,4 +19,4 @@ script:
 
 after_script:
   - CODECLIMATE_REPO_TOKEN=25cdbdb9a3ca7aebb372300017b87e21255fa3db89d11c72cc96fb0b993e5019 vendor/bin/test-reporter --stdout > codeclimate.json
-  - "sh -c 'curl -X post -d @codeclimate.json -H \"Content-Type: application/json\" -H \"User-Agent: Code Climate PHP Test reporter\" https://codeclimate.com/test_reports ;'"
+  - "sh -c 'curl -X POST -d @codeclimate.json -H \"Content-Type: application/json\" -H \"User-Agent: Code Climate PHP Test reporter\" https://codeclimate.com/test_reports ;'"
