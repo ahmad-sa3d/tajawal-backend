@@ -154,6 +154,7 @@ class HotelsStore {
 	 */
 	public function paginate($per_page = 10, $current_page = 1, array $options = [])
 	{
+		$current_page = $current_page < 1 ? 1: $current_page;
 		$per_page = $per_page <= 0 ? 10 : $per_page;
 		$skip = ($current_page - 1) * $per_page;
 		$sliced_hotels = $this->hotels->slice($skip, $per_page);
