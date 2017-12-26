@@ -58,20 +58,11 @@ class DateFilter implements FilterContract
 			return true;
 		}
 
-		$is_available = false;
-
 		if (!$this->hasAvailabilityPeriods($hotel)) {
 			return false;
 		}
 
-		foreach ($hotel['availability'] as $period) {
-			if ($this->from >= strtotime($period['from']) && $this->to <= strtotime($period['to'])) {
-				$is_available = true;
-				break;
-			}
-		}
-
-		return $is_available;
+		return $this->isAvailable($hotel);
 	}
 
 	/**
@@ -100,8 +91,27 @@ class DateFilter implements FilterContract
 	 * @param  array  $hotel hotel to check
 	 * @return boolean
 	 */
-	public function hasAvailabilityPeriods($hotel)
+	private function hasAvailabilityPeriods($hotel)
 	{
 		return (!isset($hotel['availability']) || !is_array($hotel['availability'])) ? false : true;
+	}
+
+	/**
+	 * Check if Hotel is available or not
+	 * @param  array  $hotel Hotel
+	 * @return boolean
+	 */
+	private function isAvailable($hotel)
+	{
+		$is_available = false;
+
+		foreach ($hotel['availability'] as $period) {
+			if ($this->from >= strtotime($period['from']) && $this->to <= strtotime($period['to'])) {
+				$is_available = true;
+				break;
+			}
+		}
+
+		return $is_available;
 	}
 }
