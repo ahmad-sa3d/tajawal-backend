@@ -29,27 +29,14 @@ class PriceFilter implements FilterContract
 		}
 
 		$min_max = array_sort(explode(':', $min));
-
-		if(count($min_max) > 1){
-			$this->min = $min_max[0];
-			$this->max = $min_max[1];
-		} else {
-			$this->min = $min_max[0];
-		}
-
-		if($this->min < 0) {
-			$this->min = 0;
-		}
+		$this->min = $min_max[0] < 0 ? 0 : $min_max[0];
+		$this->max = count($min_max) > 1 ? $min_max[1] : $max;
 
 		if(!$this->max) {
-			$this->max = $max ? $max : $this->min;
+			$this->max = $this->min;
 		}
 
-		if($this->max < $this->min) {
-			$max = $this->max;
-			$this->max = $this->min;
-			$this->min = $max;
-		}
+		$this->checkRealMinMax();
 	}
 	
 	/**
@@ -67,5 +54,20 @@ class PriceFilter implements FilterContract
 		}
 
 		return $hotel['price'] >= $this->min && $hotel['price'] <= $this->max;
+	}
+
+	/**
+	 * Check which really min and max value
+	 * and reassign values to make sure min is the least value
+	 * and max is the greatest value
+	 * @return void
+	 */
+	private function checkRealMinMax()
+	{
+		if($this->max < $this->min) {
+			$max = $this->max;
+			$this->max = $this->min;
+			$this->min = $max;
+		}
 	}
 }
