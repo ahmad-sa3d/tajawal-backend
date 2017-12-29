@@ -21,6 +21,7 @@
 	>
 	> `APP_API_URL` => api.tajawal.dev
 	
+### Usage
 * Web Service URL `{APP_API_URL}/v1/hotels`
 * Web Service Method `Get`
 * Web Service Query Inputs

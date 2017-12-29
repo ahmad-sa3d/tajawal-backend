@@ -6,7 +6,7 @@ namespace App\Services\Hotels;
  */
 interface OrderContract {
 	/**
-	 * Function that responsible to implementing how to apply order
+	 * Method that responsible to implementing how to apply order
 	 * @param  array $hotel hotel data
 	 * @return Mix        value to sort by
 	 */
@@ -35,5 +35,4 @@ interface OrderContract {
 	 * @return Boolean
 	 */
 	public function isDescOrder();
-	
 }

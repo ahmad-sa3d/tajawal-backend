@@ -6,6 +6,11 @@ namespace App\Services\Hotels;
  */
 interface FilterContract {
 
+	/**
+	 * Method which will hold how to implement filter
+	 * 
+	 * @param  array $hotel hotel
+	 * @return boolean      true if hotel passes filter, false otherwise
+	 */
 	public function apply($hotel);
-	
 }

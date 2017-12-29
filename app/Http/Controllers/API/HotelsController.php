@@ -26,7 +26,7 @@ class HotelsController extends Controller
         try {
             $data = $this->getHotelsFromApi();
         } catch(\Exception $e) {
-            return $this->sendError('Conection Error while calling API');
+            return $this->sendError('Conection Error while calling API', 408);
         }
 
         try {
@@ -44,7 +44,7 @@ class HotelsController extends Controller
 
         } catch(\Exception $e) {
             // Send Error
-            return $this->sendError($e->getMessage());
+            return $this->sendError($e->getMessage(), 488);
         }
     }
 

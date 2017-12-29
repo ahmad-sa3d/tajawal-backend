@@ -1,4 +1,11 @@
 <?php
+
+/**
+ * @author Ahmed Saad <a7mad.sa3d.2014@gmail.com>
+ * @license  MIT
+ * 
+ * @property-read Illuminate\Support\Collection $hotels Hotels Collection
+ */
 namespace App\Services\Hotels;
 
 use App\Services\Hotels\Exceptions\FilterDuplicatedException;

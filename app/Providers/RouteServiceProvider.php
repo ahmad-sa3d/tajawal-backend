@@ -72,7 +72,7 @@ class RouteServiceProvider extends ServiceProvider
      */
     protected function mapApiRoutes()
     {
-        Route::domain( env( 'APP_API_URL', 'api.student.dev' ) )
+        Route::domain( env( 'APP_API_URL', 'api.tajawal.dev' ) )
              ->middleware('api')
              ->name('api')
              ->namespace($this->api_namespace)
