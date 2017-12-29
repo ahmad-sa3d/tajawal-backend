@@ -22,10 +22,15 @@
             <directory suffix=".php">./app/Services/Hotels</directory>
         </whitelist>
     </filter>
+    <listeners>
+        <listener class="VCR\PHPUnit\TestListener\VCRTestListener" file="vendor/php-vcr/phpunit-testlistener-vcr/src/VCRTestListener.php" />
+    </listeners>
     <php>
         <env name="APP_ENV" value="testing"/>
         <env name="CACHE_DRIVER" value="array"/>
         <env name="SESSION_DRIVER" value="array"/>
         <env name="QUEUE_DRIVER" value="sync"/>
+        <env name="APP_URL" value="http://tajawal.dev"/>
+        <env name="APP_API_URL" value="http://api.tajawal.dev"/>
     </php>
 </phpunit>

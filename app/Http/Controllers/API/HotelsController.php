@@ -32,7 +32,7 @@ class HotelsController extends Controller
         try {
             $hotelsStore = new HotelsStore($data);
 
-            $hotelsStore = $this->applyFilters($hotelsStore, $request);
+            $this->applyFilters($hotelsStore, $request);
             $order = $this->getOrderByInstance($request);
 
             $output = $hotelsStore->orderBy($order)
@@ -43,7 +43,7 @@ class HotelsController extends Controller
         	return $this->sendResponse([ 'hotels' => $output ]);
 
         } catch(\Exception $e) {
-            // Send Error
+            // Send Error (Mostly Validation Error)
             return $this->sendError($e->getMessage(), 488);
         }
     }
